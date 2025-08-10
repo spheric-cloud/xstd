@@ -1,7 +1,18 @@
+// SPDX-FileCopyrightText: 2025 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
+
 package iters
 
-import "iter"
+import (
+	"iter"
+	"slices"
+)
 
+func Of[V any](v ...V) iter.Seq[V] {
+	return slices.Values(v)
+}
+
+// FromNext returns a new iterator that yields values from a function.
 func FromNext[V any](next func() (V, bool)) iter.Seq[V] {
 	return func(yield func(V) bool) {
 		for v, ok := next(); ok; v, ok = next() {
@@ -12,6 +23,7 @@ func FromNext[V any](next func() (V, bool)) iter.Seq[V] {
 	}
 }
 
+// FromNext2 returns a new iterator that yields key-value pairs from a function.
 func FromNext2[K, V any](next func() (K, V, bool)) iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for k, v, ok := next(); ok; k, v, ok = next() {
@@ -22,6 +34,7 @@ func FromNext2[K, V any](next func() (K, V, bool)) iter.Seq2[K, V] {
 	}
 }
 
+// Repeat returns a new iterator that yields the given value n times.
 func Repeat[V any](v V, n int) iter.Seq[V] {
 	if n < 0 {
 		panic("iters.Repeat: negative n")
@@ -35,6 +48,7 @@ func Repeat[V any](v V, n int) iter.Seq[V] {
 	}
 }
 
+// Repeat2 returns a new iterator that yields the given key-value pair n times.
 func Repeat2[K, V any](k K, v V, n int) iter.Seq2[K, V] {
 	if n < 0 {
 		panic("iters.Repeat2: negative n")

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2025 Axel Christ and Spheric contributors
+// SPDX-License-Identifier: Apache-2.0
+
 // Package constraints defines a set of useful constraints to be used
 // with type parameters.
 package constraints
@@ -38,6 +41,3 @@ type Signed = constraints.Signed
 // If future releases of Go add new predeclared unsigned integer types,
 // this constraint will be modified to include them.
 type Unsigned = constraints.Unsigned
-
-type Summable = interface {
-}
