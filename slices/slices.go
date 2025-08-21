@@ -98,3 +98,14 @@ func PtrValues[Slice ~[]V, V any](s Slice) iter.Seq[*V] {
 		}
 	}
 }
+
+// IndexValues returns a sequence of indexes alongside their values.
+func IndexValues[Slice ~[]V, V any](s Slice) iter.Seq2[int, V] {
+	return func(yield func(int, V) bool) {
+		for i, v := range s {
+			if !yield(i, v) {
+				return
+			}
+		}
+	}
+}
