@@ -2,7 +2,7 @@
 
 A collection of helpers for Go.
 
-[![Go Reference](https://pkg.go.dev/badge/spheric.cloud/xstd.svg)](https://pkg.go.dev/spheric.cloud/xstd)
+[![CI](https://github.com/spheric-cloud/xstd/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/spheric-cloud/xstd/actions/workflows/ci.yml) [![Go Reference](https://pkg.go.dev/badge/spheric.cloud/xstd.svg)](https://pkg.go.dev/spheric.cloud/xstd)
 
 ## Installation
 
