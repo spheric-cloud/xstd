@@ -1,0 +1,62 @@
+version: 2
+
+updates:
+  # Go modules (go.mod / go.sum)
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+
+    # Group updates into fewer PRs
+    groups:
+      go-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      go-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+
+      # Optional: group security updates too (separate from version updates)
+      go-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+
+    # Keep PR count sane (version updates only; security has its own limit)
+    open-pull-requests-limit: 10
+
+  # GitHub Actions (workflow/action versions)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Berlin"
+
+    groups:
+      gha-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      gha-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+      gha-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
+
+    open-pull-requests-limit: 10
