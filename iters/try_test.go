@@ -8,7 +8,9 @@ import (
 	"iter"
 	"testing"
 
-	"spheric.cloud/xstd/slices"
+	"slices"
+
+	"spheric.cloud/xstd/xslices"
 )
 
 var errTest = errors.New("test error")
@@ -212,7 +214,7 @@ func TestTryMap(t *testing.T) {
 	s := []int{1, 2, 3}
 	seq := LiftSuccess(slices.Values(s))
 	seq2 := TryMap(seq, func(v int) int { return v * 2 })
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryMap() error = %v, want nil", err)
 	}
@@ -225,7 +227,7 @@ func TestTryFilter(t *testing.T) {
 	s := []int{1, 2, 3, 4}
 	seq := LiftSuccess(slices.Values(s))
 	seq2 := TryFilter(seq, func(v int) bool { return v%2 == 0 })
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryFilter() error = %v, want nil", err)
 	}
@@ -239,7 +241,7 @@ func TestTryTap(t *testing.T) {
 	seq := LiftSuccess(slices.Values(s))
 	var sum int
 	seq2 := TryTap(seq, func(v int) { sum += v })
-	_, err := slices.TryCollect(seq2)
+	_, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryTap() error = %v, want nil", err)
 	}
@@ -379,7 +381,7 @@ func TestTryMapErr(t *testing.T) {
 	s := []int{1, 2, 3}
 	seq := LiftSuccess(slices.Values(s))
 	seq2 := TryMapErr(seq, func(v int) (int, error) { return v * 2, nil })
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryMapErr() error = %v, want nil", err)
 	}
@@ -392,7 +394,7 @@ func TestTryFlatMap(t *testing.T) {
 	s := []int{1, 2, 3}
 	seq := LiftSuccess(slices.Values(s))
 	seq2 := TryFlatMap(seq, func(v int) iter.Seq[int] { return Range(0, v) })
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryFlatMap() error = %v, want nil", err)
 	}
@@ -454,7 +456,7 @@ func TestTryTransformErr(t *testing.T) {
 	seq2 := TryTransformErr(seq, func(seq iter.Seq[int]) iter.Seq2[int, error] {
 		return TryMap(LiftSuccess(seq), func(v int) int { return v * 2 })
 	})
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryTransformErr() error = %v, want nil", err)
 	}
@@ -466,7 +468,7 @@ func TestTryTransformErr(t *testing.T) {
 func TestLiftSuccess(t *testing.T) {
 	s := []int{1, 2, 3}
 	seq := LiftSuccess(slices.Values(s))
-	res, err := slices.TryCollect(seq)
+	res, err := xslices.TryCollect(seq)
 	if err != nil {
 		t.Errorf("LiftSuccess() error = %v, want nil", err)
 	}
@@ -478,7 +480,7 @@ func TestLiftSuccess(t *testing.T) {
 func TestLiftFailure(t *testing.T) {
 	s := []error{errTest, nil}
 	seq := LiftFailure[int](slices.Values(s))
-	res, err := slices.TryCollect(seq)
+	res, err := xslices.TryCollect(seq)
 	if err != errTest {
 		t.Errorf("LiftFailure() error = %v, want %v", err, errTest)
 	}
@@ -496,7 +498,7 @@ func TestTryMapOKErr(t *testing.T) {
 		}
 		return v * 2, nil, true
 	})
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryMapOKErr() error = %v, want nil", err)
 	}
@@ -509,7 +511,7 @@ func TestTryFlatMapErr(t *testing.T) {
 	s := []int{1, 2, 3}
 	seq := LiftSuccess(slices.Values(s))
 	seq2 := TryFlatMapErr(seq, func(v int) (iter.Seq[int], error) { return Range(0, v), nil })
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryFlatMapErr() error = %v, want nil", err)
 	}
@@ -522,7 +524,7 @@ func TestTryFilterErr(t *testing.T) {
 	s := []int{1, 2, 3, 4}
 	seq := LiftSuccess(slices.Values(s))
 	seq2 := TryFilterErr(seq, func(v int) (bool, error) { return v%2 == 0, nil })
-	res, err := slices.TryCollect(seq2)
+	res, err := xslices.TryCollect(seq2)
 	if err != nil {
 		t.Errorf("TryFilterErr() error = %v, want nil", err)
 	}

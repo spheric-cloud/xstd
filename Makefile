@@ -34,11 +34,7 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: generate
-generate: dropin-gen ## Generate code and other artifacts.
-	$(DROPIN_GEN) -i slices -o ./slices
-	$(DROPIN_GEN) -i strings -o ./strings
-	$(DROPIN_GEN) -i maps -o ./maps
-	$(DROPIN_GEN) -i net/http -o ./net/http
+generate: ## Generate code and other artifacts.
 
 .PHONY: fmt
 fmt: goimports ## Run goimports against code.
@@ -54,11 +50,11 @@ lint: golangci-lint ## Run golangci-lint on the code.
 
 .PHONY: add-license
 add-license: addlicense ## Add license headers to all go files.
-	find . -name '*.go' -exec $(ADDLICENSE) -f hack/license-header.txt {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -c 'Axel Christ and Spheric contributors' -l apache -s {} +
 
 .PHONY: check-license
 check-license: addlicense ## Check that every file has a license header present.
-	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'Spheric authors' {} +
+	find . -name '*.go' -exec $(ADDLICENSE) -check -c 'Axel Christ and Spheric contributors' -l apache -s {} +
 
 .PHONY: check
 check: generate add-license fmt lint test # Generate manifests, code, lint, add licenses, test
@@ -81,13 +77,11 @@ $(LOCALBIN):
 ADDLICENSE ?= $(LOCALBIN)/addlicense
 GOIMPORTS ?= $(LOCALBIN)/goimports
 GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
-DROPIN_GEN ?= $(LOCALBIN)/dropin-gen
 
 ## Tool Versions
-ADDLICENSE_VERSION ?= v1.1.1
-GOIMPORTS_VERSION ?= v0.34.0
-GOLANGCI_LINT_VERSION ?= v2.2.1
-DROPIN_GEN_VERSION ?= main
+ADDLICENSE_VERSION ?= v1.2.0
+GOIMPORTS_VERSION ?= v0.42.0
+GOLANGCI_LINT_VERSION ?= v2.10.1
 
 .PHONY: addlicense
 addlicense: $(ADDLICENSE) ## Download addlicense locally if necessary.
@@ -103,8 +97,3 @@ $(GOIMPORTS): $(LOCALBIN)
 golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary.
 $(GOLANGCI_LINT): $(LOCALBIN)
 	test -s $(LOCALBIN)/golangci-lint || GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
-
-.PHONY: dropin-gen
-dropin-gen: $(DROPIN_GEN) ## Download dropin-gen locally if necessary.
-$(DROPIN_GEN): $(LOCALBIN)
-	test -s $(LOCALBIN)/dropin-gen || GOBIN=$(LOCALBIN) go install spheric.cloud/dropin-gen@$(DROPIN_GEN_VERSION)

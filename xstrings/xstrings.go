@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2025 Axel Christ and Spheric contributors
 // SPDX-License-Identifier: Apache-2.0
 
-package strings
+package xstrings
 
 import (
 	"iter"
@@ -10,6 +10,13 @@ import (
 	"strings"
 )
 
+// JoinSeq joins the elements of the given sequence with the given separator.
+func JoinSeq(elems iter.Seq[string], sep string) string {
+	var sb strings.Builder
+	WriteJoiningSeq(&sb, elems, sep)
+	return sb.String()
+}
+
 // WriteJoining appends the elements of elems to the Builder, separated by sep.
 func WriteJoining(sb *strings.Builder, elems []string, sep string) {
 	WriteJoiningSeq(sb, slices.Values(elems), sep)
@@ -17,12 +24,12 @@ func WriteJoining(sb *strings.Builder, elems []string, sep string) {
 
 // WriteJoiningSeq appends the elements of elems to the Builder, separated by sep.
 func WriteJoiningSeq(sb *strings.Builder, elems iter.Seq[string], sep string) {
-	var next bool
+	var needSep bool
 	for elem := range elems {
-		if next {
+		if needSep {
 			sb.WriteString(sep)
 		} else {
-			next = true
+			needSep = true
 		}
 		sb.WriteString(elem)
 	}
@@ -33,12 +40,12 @@ func Random(n int, charset []rune) string {
 	if n < 0 {
 		panic("strings.Random: negative n")
 	}
-	if len(charset) == 0 {
-		panic("strings.Random: empty charset")
+	if n > 0 && len(charset) == 0 {
+		panic("strings.Random: non-zero n and empty charset")
 	}
 	var sb strings.Builder
 	sb.Grow(n)
-	for i := 0; i < n; i++ {
+	for range n {
 		r := charset[rand.IntN(len(charset))]
 		sb.WriteRune(r)
 	}

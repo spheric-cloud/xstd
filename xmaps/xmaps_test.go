@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2025 Axel Christ and Spheric contributors
 // SPDX-License-Identifier: Apache-2.0
 
-package maps
+package xmaps
 
 import (
 	"testing"
@@ -45,37 +45,43 @@ func TestPopValue(t *testing.T) {
 	}
 }
 
-func TestSingle(t *testing.T) {
-	// Test with single element
-	mSingle := map[string]int{"a": 1}
-	k, v, n := Single(mSingle)
-	if n != 1 {
-		t.Errorf("Single on a single-element map returned n=%d, want 1", n)
-	}
-	if k != "a" || v != 1 {
-		t.Errorf("Single on a single-element map returned %s, %d, want a, 1", k, v)
-	}
-
-	// Test with multiple elements
-	mMulti := map[string]int{"a": 1, "b": 2}
-	_, _, n = Single(mMulti)
-	if n != 2 {
-		t.Errorf("Single on a multi-element map returned n=%d, want 2", n)
-	}
-
-	// Test with empty map
-	mEmpty := map[string]int{}
-	_, _, n = Single(mEmpty)
-	if n != 0 {
-		t.Errorf("Single on an empty map returned n=%d, want 0", n)
+func TestInverse(t *testing.T) {
+	m := map[string]int{"a": 1, "b": 2}
+	inv := Inverse(m)
+	if inv[1] != "a" || inv[2] != "b" {
+		t.Errorf("Inverse got %v", inv)
 	}
 }
 
-func TestSingleValue(t *testing.T) {
-	// Test with single element
-	mSingle := map[string]int{"a": 1}
-	k, v := SingleValue(mSingle)
+func TestKeysByValue(t *testing.T) {
+	m := map[string]int{"a": 1, "b": 1, "c": 2}
+	kbv := KeysByValue(m)
+	if len(kbv[1]) != 2 {
+		t.Errorf("KeysByValue[1] len = %d, want 2", len(kbv[1]))
+	}
+	if len(kbv[2]) != 1 || kbv[2][0] != "c" {
+		t.Errorf("KeysByValue[2] = %v, want [c]", kbv[2])
+	}
+}
+
+func TestGetAny(t *testing.T) {
+	m := map[string]int{"a": 1}
+	k, v, ok := GetAny(m)
+	if !ok || k != "a" || v != 1 {
+		t.Errorf("GetAny got %s, %d, %t, want a, 1, true", k, v, ok)
+	}
+
+	mEmpty := map[string]int{}
+	_, _, ok = GetAny(mEmpty)
+	if ok {
+		t.Error("GetAny on empty map should return false")
+	}
+}
+
+func TestGetAnyValue(t *testing.T) {
+	m := map[string]int{"a": 1}
+	k, v := GetAnyValue(m)
 	if k != "a" || v != 1 {
-		t.Errorf("SingleValue on a single-element map returned %s, %d, want a, 1", k, v)
+		t.Errorf("GetAnyValue got %s, %d, want a, 1", k, v)
 	}
 }

@@ -12,12 +12,12 @@ import (
 // Cast performs a type assertion to the given type.
 // It will panic if the type assertion fails.
 func Cast[To any](in any) To {
-	return any(in).(To)
+	return in.(To)
 }
 
-// CastOK performs a type assertion to the given type.
+// As performs a type assertion to the given type.
 // It returns the asserted value and a boolean indicating whether the assertion succeeded.
-func CastOK[To any](in any) (To, bool) {
+func As[To any](in any) (To, bool) {
 	vTo, ok := in.(To)
 	return vTo, ok
 }
@@ -54,7 +54,7 @@ func TODO[V any](args ...any) V {
 	var sb strings.Builder
 	sb.WriteString("TODO: ")
 	if len(args) > 0 {
-		_, _ = fmt.Fprintln(&sb, args...)
+		_, _ = fmt.Fprint(&sb, args...)
 	} else {
 		_, _ = fmt.Fprintf(&sb, "provide a value of type %T", Zero[V]())
 	}

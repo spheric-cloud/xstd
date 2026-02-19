@@ -57,7 +57,7 @@ func TestDerefOrZero(t *testing.T) {
 	}
 }
 
-func TestIsNil(t *testing.T) {
+func TestIsNilAny(t *testing.T) {
 	type args struct {
 		v any
 	}
@@ -84,8 +84,8 @@ func TestIsNil(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsNil(tt.args.v); got != tt.want {
-				t.Errorf("IsNil() = %v, want %v", got, tt.want)
+			if got := IsNilAny(tt.args.v); got != tt.want {
+				t.Errorf("IsNilAny() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -145,5 +145,65 @@ func TestEqualFunc(t *testing.T) {
 	}
 	if EqualFunc(&v1, nil, eq) {
 		t.Error("expected pointers to be not equal")
+	}
+}
+
+func TestMap(t *testing.T) {
+	v := 42
+	result := Map(&v, func(n int) string { return "val" })
+	if result == nil || *result != "val" {
+		t.Error("Map on non-nil pointer failed")
+	}
+	result = Map((*int)(nil), func(n int) string { return "val" })
+	if result != nil {
+		t.Error("Map on nil pointer should return nil")
+	}
+}
+
+func TestMapRef(t *testing.T) {
+	v := 42
+	result := MapRef(&v, func(n *int) string { return "val" })
+	if result == nil || *result != "val" {
+		t.Error("MapRef on non-nil pointer failed")
+	}
+	result = MapRef((*int)(nil), func(n *int) string { return "val" })
+	if result != nil {
+		t.Error("MapRef on nil pointer should return nil")
+	}
+}
+
+func TestFlatMap(t *testing.T) {
+	v := 42
+	s := "hello"
+	result := FlatMap(&v, func(n *int) *string { return &s })
+	if result == nil || *result != "hello" {
+		t.Error("FlatMap on non-nil pointer failed")
+	}
+	result = FlatMap((*int)(nil), func(n *int) *string { return &s })
+	if result != nil {
+		t.Error("FlatMap on nil pointer should return nil")
+	}
+}
+
+func TestFlatten(t *testing.T) {
+	v := 42
+	p := &v
+	result := Flatten(&p)
+	if result == nil || *result != 42 {
+		t.Error("Flatten on non-nil double pointer failed")
+	}
+	result = Flatten((**int)(nil))
+	if result != nil {
+		t.Error("Flatten on nil double pointer should return nil")
+	}
+}
+
+func TestIsNil(t *testing.T) {
+	v := 42
+	if IsNil(&v) {
+		t.Error("IsNil on non-nil pointer should return false")
+	}
+	if !IsNil[int](nil) {
+		t.Error("IsNil on nil pointer should return true")
 	}
 }

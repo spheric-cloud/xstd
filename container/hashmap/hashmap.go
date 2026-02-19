@@ -4,7 +4,6 @@
 package hashmap
 
 import (
-	"hash/maphash"
 	"iter"
 	"slices"
 )
@@ -14,32 +13,27 @@ type entry[K, V any] struct {
 	value V
 }
 
-type HashMap[K, V any] struct {
-	hash    func(K) uint64
+type HashMap[H comparable, K, V any] struct {
+	hash    func(K) H
 	equal   func(K, K) bool
 	len     int
-	entries map[uint64][]*entry[K, V]
+	entries map[H][]*entry[K, V]
 }
 
-func New[K, V any](hash func(K) uint64, equal func(k1, k2 K) bool) *HashMap[K, V] {
-	return &HashMap[K, V]{
+// New creates a new HashMap with the given hash and equality functions.
+func New[H comparable, K, V any](hash func(K) H, equal func(k1, k2 K) bool) *HashMap[H, K, V] {
+	return &HashMap[H, K, V]{
 		hash:    hash,
 		equal:   equal,
-		entries: make(map[uint64][]*entry[K, V]),
+		entries: make(map[H][]*entry[K, V]),
 	}
 }
 
-var seed = maphash.MakeSeed()
-
-func NewComparable[K comparable, V any]() *HashMap[K, V] {
-	return New[K, V](func(k K) uint64 { return maphash.Comparable(seed, k) }, func(k1 K, k2 K) bool { return k1 == k2 })
-}
-
-func (h *HashMap[K, V]) findEntryIndex(entries []*entry[K, V], key K) int {
+func (h *HashMap[H, K, V]) findEntryIndex(entries []*entry[K, V], key K) int {
 	return slices.IndexFunc(entries, func(e *entry[K, V]) bool { return h.equal(e.key, key) })
 }
 
-func (h *HashMap[K, V]) findEntry(entries []*entry[K, V], key K) *entry[K, V] {
+func (h *HashMap[H, K, V]) findEntry(entries []*entry[K, V], key K) *entry[K, V] {
 	idx := h.findEntryIndex(entries, key)
 	if idx == -1 {
 		return nil
@@ -47,7 +41,8 @@ func (h *HashMap[K, V]) findEntry(entries []*entry[K, V], key K) *entry[K, V] {
 	return entries[idx]
 }
 
-func (h *HashMap[K, V]) Put(key K, value V) {
+// Set inserts or updates the value for the given key.
+func (h *HashMap[H, K, V]) Set(key K, value V) {
 	hash := h.hash(key)
 	entries := h.entries[hash]
 	e := h.findEntry(entries, key)
@@ -59,7 +54,8 @@ func (h *HashMap[K, V]) Put(key K, value V) {
 	}
 }
 
-func (h *HashMap[K, V]) Get(key K) (V, bool) {
+// Get returns the value for the given key and whether it was found.
+func (h *HashMap[H, K, V]) Get(key K) (V, bool) {
 	hash := h.hash(key)
 	entries, ok := h.entries[hash]
 	if !ok {
@@ -75,32 +71,41 @@ func (h *HashMap[K, V]) Get(key K) (V, bool) {
 	return e.value, true
 }
 
-func (h *HashMap[K, V]) Delete(key K) bool {
+// Value returns the value for the given key, or the zero value if not found.
+func (h *HashMap[H, K, V]) Value(key K) V {
+	v, _ := h.Get(key)
+	return v
+}
+
+// Delete removes the entry for the given key.
+func (h *HashMap[H, K, V]) Delete(key K) {
 	hash := h.hash(key)
 	entries, ok := h.entries[hash]
 	if !ok {
-		return false
+		return
 	}
 
 	idx := h.findEntryIndex(entries, key)
 	if idx < 0 {
-		return false
+		return
 	}
 
 	h.entries[hash] = slices.Delete(entries, idx, idx+1)
 	h.len--
-	return true
 }
 
-func (h *HashMap[K, V]) Len() int {
+// Len returns the number of entries in the map.
+func (h *HashMap[H, K, V]) Len() int {
 	return h.len
 }
 
-func (h *HashMap[K, V]) Clear() {
+// Clear removes all entries from the map.
+func (h *HashMap[H, K, V]) Clear() {
 	clear(h.entries)
 }
 
-func (h *HashMap[K, V]) All() iter.Seq2[K, V] {
+// All returns an iterator over all key-value pairs in the map.
+func (h *HashMap[H, K, V]) All() iter.Seq2[K, V] {
 	return func(yield func(K, V) bool) {
 		for _, es := range h.entries {
 			for _, e := range es {
@@ -112,7 +117,8 @@ func (h *HashMap[K, V]) All() iter.Seq2[K, V] {
 	}
 }
 
-func (h *HashMap[K, V]) Keys() iter.Seq[K] {
+// Keys returns an iterator over all keys in the map.
+func (h *HashMap[H, K, V]) Keys() iter.Seq[K] {
 	return func(yield func(K) bool) {
 		for _, es := range h.entries {
 			for _, e := range es {
@@ -124,7 +130,8 @@ func (h *HashMap[K, V]) Keys() iter.Seq[K] {
 	}
 }
 
-func (h *HashMap[K, V]) Values() iter.Seq[V] {
+// Values returns an iterator over all values in the map.
+func (h *HashMap[H, K, V]) Values() iter.Seq[V] {
 	return func(yield func(V) bool) {
 		for _, es := range h.entries {
 			for _, e := range es {

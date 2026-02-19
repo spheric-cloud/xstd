@@ -5,6 +5,8 @@
 // Wherever possible, it mimics the exact internal behavior as closely as possible.
 package list
 
+import "iter"
+
 // Element is an element of a List.
 type Element[E any] struct {
 	next *Element[E]
@@ -210,4 +212,26 @@ func (l *List[E]) Dequeue() (E, bool) {
 		return zero, false
 	}
 	return l.Remove(l.Front()), true
+}
+
+// Elems returns an iterator over all elements in the list from front to back.
+func (l *List[E]) Elems() iter.Seq[*Element[E]] {
+	return func(yield func(*Element[E]) bool) {
+		for e := l.Front(); e != nil; e = e.Next() {
+			if !yield(e) {
+				return
+			}
+		}
+	}
+}
+
+// Values returns an iterator over all values in the list from front to back.
+func (l *List[E]) Values() iter.Seq[E] {
+	return func(yield func(E) bool) {
+		for e := range l.Elems() {
+			if !yield(e.Value) {
+				return
+			}
+		}
+	}
 }

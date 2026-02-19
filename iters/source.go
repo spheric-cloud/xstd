@@ -8,6 +8,7 @@ import (
 	"slices"
 )
 
+// Of returns an iterator over the given values.
 func Of[V any](v ...V) iter.Seq[V] {
 	return slices.Values(v)
 }
@@ -40,7 +41,7 @@ func Repeat[V any](v V, n int) iter.Seq[V] {
 		panic("iters.Repeat: negative n")
 	}
 	return func(yield func(V) bool) {
-		for i := 0; i < n; i++ {
+		for range n {
 			if !yield(v) {
 				return
 			}
@@ -54,7 +55,29 @@ func Repeat2[K, V any](k K, v V, n int) iter.Seq2[K, V] {
 		panic("iters.Repeat2: negative n")
 	}
 	return func(yield func(K, V) bool) {
-		for i := 0; i < n; i++ {
+		for range n {
+			if !yield(k, v) {
+				return
+			}
+		}
+	}
+}
+
+// RepeatInf Returns a new iterator that yields the given value indefinitely.
+func RepeatInf[V any](v V) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for {
+			if !yield(v) {
+				return
+			}
+		}
+	}
+}
+
+// Repeat2Inf Returns a new iterator that yields the given key-value pair indefinitely.
+func Repeat2Inf[K, V any](k K, v V) iter.Seq2[K, V] {
+	return func(yield func(K, V) bool) {
+		for {
 			if !yield(k, v) {
 				return
 			}

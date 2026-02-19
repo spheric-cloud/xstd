@@ -8,7 +8,7 @@ import (
 	"iter"
 	"slices"
 
-	"spheric.cloud/xstd/constraints"
+	"golang.org/x/exp/constraints"
 )
 
 // Tap calls f for each value in seq, and yields the value.
@@ -81,6 +81,28 @@ func Concat2[K, V any](seq ...iter.Seq2[K, V]) iter.Seq2[K, V] {
 	return Flatten2(slices.Values(seq))
 }
 
+// Ref returns an iter.Seq that yields references to the values of the given seq.
+func Ref[V any](seq iter.Seq[V]) iter.Seq[*V] {
+	return func(yield func(*V) bool) {
+		for v := range seq {
+			if !yield(&v) {
+				return
+			}
+		}
+	}
+}
+
+// Deref returns an iter.Seq that dereferences the values of the given seq.
+func Deref[V any](seq iter.Seq[*V]) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for v := range seq {
+			if !yield(*v) {
+				return
+			}
+		}
+	}
+}
+
 // Map returns a new iterator that yields the results of calling f on each value from seq.
 func Map[VIn, VOut any](seq iter.Seq[VIn], f func(VIn) VOut) iter.Seq[VOut] {
 	return func(yield func(VOut) bool) {
@@ -103,9 +125,53 @@ func Map2[KIn, VIn, KOut, VOut any](seq iter.Seq2[KIn, VIn], f func(KIn, VIn) (K
 	}
 }
 
+// MapRef returns a new iterator that yields the results of calling f on a reference to each value from seq.
+func MapRef[VIn, VOut any](seq iter.Seq[VIn], f func(*VIn) VOut) iter.Seq[VOut] {
+	return func(yield func(VOut) bool) {
+		for v := range seq {
+			if !yield(f(&v)) {
+				return
+			}
+		}
+	}
+}
+
+// MapRefDeref returns a new iterator that yields the results of calling f on a reference to each value from seq.
+func MapRefDeref[VIn, VOut any](seq iter.Seq[VIn], f func(*VIn) *VOut) iter.Seq[VOut] {
+	return func(yield func(VOut) bool) {
+		for v := range seq {
+			if !yield(*f(&v)) {
+				return
+			}
+		}
+	}
+}
+
 // MapKeys returns a new iterator that yields the results of calling f on each key from seq.
 func MapKeys[KIn, V, KOut any](seq iter.Seq2[KIn, V], f func(KIn) KOut) iter.Seq2[KOut, V] {
 	return Map2(seq, func(k KIn, v V) (KOut, V) { return f(k), v })
+}
+
+// MapRefKeys returns a new iterator that yields the results of calling f on a reference of each key from seq.
+func MapRefKeys[KIn, V, KOut any](seq iter.Seq2[KIn, V], f func(*KIn) KOut) iter.Seq2[KOut, V] {
+	return func(yield func(KOut, V) bool) {
+		for k, v := range seq {
+			if !yield(f(&k), v) {
+				return
+			}
+		}
+	}
+}
+
+// MapRefDerefKeys returns a new iterator that yields the results of calling f on a reference of each key from seq.
+func MapRefDerefKeys[KIn, V, KOut any](seq iter.Seq2[KIn, V], f func(*KIn) *KOut) iter.Seq2[KOut, V] {
+	return func(yield func(KOut, V) bool) {
+		for k, v := range seq {
+			if !yield(*f(&k), v) {
+				return
+			}
+		}
+	}
 }
 
 // MapValues returns a new iterator that yields the results of calling f on each value from seq.
@@ -221,12 +287,14 @@ func LiftZeroKeys[K, V any](seq iter.Seq[V]) iter.Seq2[K, V] {
 	})
 }
 
+// LiftSingletonKey lifts a sequence of values to a sequence of key-value pairs with a constant key.
 func LiftSingletonKey[K, V any](seq iter.Seq[V], k K) iter.Seq2[K, V] {
 	return MapLift(seq, func(v V) (K, V) {
 		return k, v
 	})
 }
 
+// LiftSingletonValue lifts a sequence of keys to a sequence of key-value pairs with a constant value.
 func LiftSingletonValue[K, V any](seq iter.Seq[K], v V) iter.Seq2[K, V] {
 	return MapLift(seq, func(k K) (K, V) {
 		return k, v

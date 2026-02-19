@@ -63,10 +63,10 @@ func TestSQueue(t *testing.T) {
 
 func TestSQueue_EnqueueDequeue(t *testing.T) {
 	q := New[int](0)
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		q.Enqueue(i)
 	}
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		v, ok := q.Dequeue()
 		if !ok || v != i {
 			t.Errorf("Dequeue() = %d, %v, want %d, true", v, ok, i)

@@ -8,8 +8,8 @@ import (
 	"slices"
 	"testing"
 
+	"spheric.cloud/xstd/container/set"
 	"spheric.cloud/xstd/iters"
-	"spheric.cloud/xstd/set"
 )
 
 func TestHasAll(t *testing.T) {
@@ -88,7 +88,7 @@ func TestValues(t *testing.T) {
 
 func TestPop(t *testing.T) {
 	s := set.New("a", "b", "c")
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		v, ok := Pop(s)
 		if !ok {
 			t.Error("expected ok")

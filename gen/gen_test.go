@@ -26,14 +26,14 @@ func TestCast(t *testing.T) {
 
 func TestCastOK(t *testing.T) {
 	var v any = "hello"
-	s, ok := CastOK[string](v)
+	s, ok := As[string](v)
 	if !ok || s != "hello" {
-		t.Errorf("CastOK failed, got %s, %t, want hello, true", s, ok)
+		t.Errorf("As failed, got %s, %t, want hello, true", s, ok)
 	}
 
-	i, ok := CastOK[int](v)
+	i, ok := As[int](v)
 	if ok || i != 0 {
-		t.Errorf("CastOK failed, got %d, %t, want 0, false", i, ok)
+		t.Errorf("As failed, got %d, %t, want 0, false", i, ok)
 	}
 }
 

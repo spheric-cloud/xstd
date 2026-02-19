@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2025 Axel Christ and Spheric contributors
 // SPDX-License-Identifier: Apache-2.0
 
-package slices
+package xslices
 
 import (
 	"errors"
@@ -151,17 +151,17 @@ func TestTryCopySeq(t *testing.T) {
 
 func TestPtrValues(t *testing.T) {
 	s := []int{1, 2, 3}
-	seq := PtrValues(s)
+	seq := RefValues(s)
 	var ptrs []*int
 	for p := range seq {
 		ptrs = append(ptrs, p)
 	}
 	if len(ptrs) != 3 {
-		t.Fatalf("PtrValues returned %d pointers, want 3", len(ptrs))
+		t.Fatalf("RefValues returned %d pointers, want 3", len(ptrs))
 	}
 	for i, p := range ptrs {
 		if *p != s[i] {
-			t.Errorf("PtrValues pointer %d has value %d, want %d", i, *p, s[i])
+			t.Errorf("RefValues pointer %d has value %d, want %d", i, *p, s[i])
 		}
 	}
 

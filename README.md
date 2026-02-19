@@ -1,6 +1,6 @@
 # xstd
 
-A collection of generic helpers for Go, extending the standard library with a focus on modern Go features like generics and iterators.
+A collection of helpers for Go.
 
 [![Go Reference](https://pkg.go.dev/badge/spheric.cloud/xstd.svg)](https://pkg.go.dev/spheric.cloud/xstd)
 
@@ -14,48 +14,61 @@ go get spheric.cloud/xstd
 
 This repository is organized into the following packages:
 
-### [`constraints`](constraints)
+### [`xconstraints`](xconstraints)
+
 Provides a collection of useful type constraints for generic programming.
 
 ### [`container/hashmap`](container/hashmap)
+
 A generic hash map implementation.
 
 ### [`container/list`](container/list)
+
 A generic doubly-linked list implementation.
 
 ### [`container/squeue`](container/squeue)
+
 A generic sequential queue implementation.
 
 ### [`funcs`](funcs)
+
 Provides a collection of generic function adapters and helpers.
 
 ### [`gen`](gen)
+
 Contains code generation tools for the repository.
 
 ### [`iters`](iters)
+
 Provides a rich set of helpers and adapters for working with Go's new iterators (`iter.Seq`).
 
-### [`maps`](maps)
+### [`xmaps`](xmaps)
+
 Contains generic functions for working with maps.
 
-### [`net/http`](net/http)
+### [`net/xhttp`](net/xhttp)
+
 Provides helpers and utilities for the `net/http` package.
 
 ### [`ptrs`](ptrs)
+
 A collection of utility functions for working with pointers.
 
-### [`set`](set)
+### [`set`](container/set)
+
 A generic set implementation.
 
 ### [`sets`](sets)
+
 Contains generic functions for working with sets.
 
-### [`slices`](slices)
+### [`xslices`](xslices)
+
 Provides generic functions for working with slices.
 
-### [`strings`](strings)
-Contains helper functions for working with strings.
+### [`xstrings`](xstrings)
 
+Contains helper functions for working with strings.
 
 ## License
 

@@ -6,7 +6,7 @@ package iters
 import (
 	"iter"
 
-	"spheric.cloud/xstd/constraints"
+	"golang.org/x/exp/constraints"
 )
 
 // Unique returns a new iterator that yields only the unique values from seq.
@@ -94,6 +94,36 @@ func Filter[V any](seq iter.Seq[V], f func(V) bool) iter.Seq[V] {
 			}
 
 			if !yield(v) {
+				return
+			}
+		}
+	}
+}
+
+// FilterNonNil returns a new iterator that yields only the non-nil values from seq.
+func FilterNonNil[V any](seq iter.Seq[*V]) iter.Seq[*V] {
+	return func(yield func(*V) bool) {
+		for v := range seq {
+			if v == nil {
+				continue
+			}
+
+			if !yield(v) {
+				return
+			}
+		}
+	}
+}
+
+// FilterNonNilDeref returns a new iterator that yields only the dereferenced non-nil values from seq.
+func FilterNonNilDeref[V any](seq iter.Seq[*V]) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for v := range seq {
+			if v == nil {
+				continue
+			}
+
+			if !yield(*v) {
 				return
 			}
 		}

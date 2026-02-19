@@ -7,7 +7,7 @@ import (
 	"cmp"
 	"iter"
 
-	"spheric.cloud/xstd/constraints"
+	"golang.org/x/exp/constraints"
 )
 
 // TryTransform is a helper to implement iterators that transform a sequence of values that can fail.

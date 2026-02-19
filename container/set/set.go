@@ -3,6 +3,11 @@
 
 package set
 
+import (
+	"iter"
+	"maps"
+)
+
 // Set is a generic set data structure.
 type Set[V comparable] map[V]struct{}
 
@@ -33,6 +38,11 @@ func (s Set[V]) Delete(vs ...V) Set[V] {
 func (s Set[V]) Has(v V) bool {
 	_, ok := s[v]
 	return ok
+}
+
+// Values returns an iterator over all values in the set.
+func (s Set[V]) Values() iter.Seq[V] {
+	return maps.Keys(s)
 }
 
 // Len returns the length of the set.

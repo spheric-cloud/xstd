@@ -7,7 +7,7 @@ import (
 	"cmp"
 	"iter"
 
-	"spheric.cloud/xstd/constraints"
+	"golang.org/x/exp/constraints"
 	"spheric.cloud/xstd/gen"
 )
 

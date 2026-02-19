@@ -8,7 +8,7 @@ import (
 	"iter"
 	"maps"
 
-	"spheric.cloud/xstd/set"
+	"spheric.cloud/xstd/container/set"
 )
 
 // HasAll returns true if the set contains all values in the given sequence.
