@@ -5,8 +5,6 @@ package xslices
 
 type lengthOption int
 
-func (l lengthOption) initSliceOption() {}
-
 func (l lengthOption) ApplyToMakeMap(o MakeMapOptions) {
 	o.makeMapOptions().len = (*int)(&l)
 }
@@ -15,11 +13,11 @@ func (l lengthOption) ApplyToInitSlice(o InitSliceOptions) {
 	o.initSliceOptions().lengthAndCapacity = &lenAndCap{cap: int(l), len: int(l)}
 }
 
-func WithLen(length int) interface{ initSliceOption() } {
+func WithLen(length int) InitSliceOption {
 	return lengthOption(length)
 }
 
-func WithLenAndCap(length, capacity int) interface{ initSliceOption() } {
+func WithLenAndCap(length, capacity int) InitSliceOption {
 	return &lenAndCap{length, capacity}
 }
 
@@ -75,7 +73,9 @@ type lenAndCap struct {
 	cap int
 }
 
-func (l *lenAndCap) initSliceOption() {}
+func (l *lenAndCap) ApplyToInitSlice(o InitSliceOptions) {
+	o.initSliceOptions().lengthAndCapacity = l
+}
 
 type initSliceOptions struct {
 	lengthAndCapacity *lenAndCap

@@ -21,6 +21,25 @@ func TestCollect(t *testing.T) {
 	}
 }
 
+func TestCollectWithLenAndCap(t *testing.T) {
+	got := Collect(slices.Values([]int{1, 2, 3}), WithLenAndCap(0, 5))
+	want := []int{1, 2, 3}
+	if !slices.Equal(got, want) {
+		t.Errorf("Collect() = %v, want %v", got, want)
+	}
+	if cap(got) != 5 {
+		t.Errorf("cap(got) = %v, want %v", cap(got), 5)
+	}
+}
+
+func TestCollectWithLen(t *testing.T) {
+	got := Collect(slices.Values([]int{1, 2, 3}), WithLen(3))
+	want := []int{0, 0, 0, 1, 2, 3}
+	if !slices.Equal(got, want) {
+		t.Errorf("Collect() = %v, want %v", got, want)
+	}
+}
+
 func TestUnique(t *testing.T) {
 	got := Unique([]int{1, 2, 2, 3, 1})
 	want := []int{1, 2, 3}
