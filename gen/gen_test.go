@@ -59,29 +59,6 @@ func TestZero(t *testing.T) {
 	}
 }
 
-func TestIsZero(t *testing.T) {
-	if !IsZero(0) {
-		t.Error("IsZero(0) failed, should be true")
-	}
-	if IsZero(1) {
-		t.Error("IsZero(1) failed, should be false")
-	}
-	if !IsZero("") {
-		t.Error("IsZero(\"\") failed, should be true")
-	}
-	if IsZero("a") {
-		t.Error("IsZero(\"a\") failed, should be false")
-	}
-	var p *int
-	if !IsZero(p) {
-		t.Error("IsZero(nil) failed, should be true")
-	}
-	p = new(int)
-	if IsZero(p) {
-		t.Error("IsZero(new(int)) failed, should be false")
-	}
-}
-
 func TestNew(t *testing.T) {
 	p := New[int]()
 	if p == nil {

@@ -5,7 +5,6 @@ package gen
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -32,12 +31,6 @@ func IsA[V any](v any) bool {
 func Zero[V any]() V {
 	var zero V
 	return zero
-}
-
-// IsZero checks if a value is the zero value for its type.
-func IsZero[V any](v V) bool {
-	rv := reflect.ValueOf(v)
-	return rv.IsZero()
 }
 
 // New returns a pointer to a new zero value for a given type.
