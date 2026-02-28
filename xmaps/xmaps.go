@@ -3,6 +3,13 @@
 
 package xmaps
 
+import (
+	"maps"
+	"slices"
+
+	"spheric.cloud/xstd/container/set"
+)
+
 // Inverse returns a new map with the keys and values swapped.
 // If multiple keys map to the same value, only one will be present in the result.
 func Inverse[Map ~map[K]V, K, V comparable](m Map) map[V]K {
@@ -56,4 +63,34 @@ func Pop[Map ~map[K]V, K comparable, V any](m Map) (K, V, bool) {
 func PopValue[Map ~map[K]V, K comparable, V any](m Map) (K, V) {
 	k, v, _ := Pop(m)
 	return k, v
+}
+
+// KeySlice returns a slice of all keys in the map.
+func KeySlice[Map ~map[K]V, K comparable, V any](m Map) []K {
+	res := make([]K, 0, len(m))
+	return slices.AppendSeq(res, maps.Keys(m))
+}
+
+// ValueSlice returns a slice of all values in the map.
+func ValueSlice[Map ~map[K]V, K comparable, V any](m Map) []V {
+	res := make([]V, 0, len(m))
+	return slices.AppendSeq(res, maps.Values(m))
+}
+
+// KeySet returns a set of all keys in the map.
+func KeySet[Map ~map[K]V, K comparable, V any](m Map) set.Set[K] {
+	res := make(set.Set[K], len(m))
+	for k := range m {
+		res.Insert(k)
+	}
+	return res
+}
+
+// ValueSet returns a set of all values in the map.
+func ValueSet[Map ~map[K]V, K, V comparable](m Map) set.Set[V] {
+	res := make(set.Set[V], len(m))
+	for _, v := range m {
+		res.Insert(v)
+	}
+	return res
 }
