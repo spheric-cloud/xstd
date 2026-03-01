@@ -4,6 +4,7 @@
 package xmaps
 
 import (
+	"cmp"
 	"maps"
 	"slices"
 
@@ -96,10 +97,38 @@ func KeyRefSlice[Map ~map[K]V, K comparable, V any](m Map) []*K {
 	})
 }
 
+// SortedKeySlice returns a slice of all keys in the map, sorting them at the end.
+func SortedKeySlice[Map ~map[K]V, K cmp.Ordered, V any](m Map) []K {
+	res := KeySlice(m)
+	slices.Sort(res)
+	return res
+}
+
+// SortedKeySliceFunc returns a slice of all keys in the map, sorting them at the end by the given function.
+func SortedKeySliceFunc[Map ~map[K]V, K comparable, V any](m Map, cmp func(a, b K) int) []K {
+	res := KeySlice(m)
+	slices.SortFunc(res, cmp)
+	return res
+}
+
 // ValueSlice returns a slice of all values in the map.
 func ValueSlice[Map ~map[K]V, K comparable, V any](m Map) []V {
 	res := make([]V, 0, len(m))
 	return slices.AppendSeq(res, maps.Values(m))
+}
+
+// SortedValueSlice returns a slice of all values in the map.
+func SortedValueSlice[Map ~map[K]V, K comparable, V cmp.Ordered](m Map) []V {
+	res := ValueSlice(m)
+	slices.Sort(res)
+	return res
+}
+
+// SortedValueSliceFunc returns a slice of all values in the map sorted by the given function.
+func SortedValueSliceFunc[Map ~map[K]V, K comparable, V cmp.Ordered](m Map, cmp func(a, b V) int) []V {
+	res := ValueSlice(m)
+	slices.SortFunc(res, cmp)
+	return res
 }
 
 // ValueRefSlice returns a slice of pointers to all values in the map.

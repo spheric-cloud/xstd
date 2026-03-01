@@ -4,6 +4,7 @@
 package xslices
 
 import (
+	"cmp"
 	"iter"
 	"math/rand/v2"
 	"slices"
@@ -31,6 +32,21 @@ func Collect[V any](seq iter.Seq[V], opts ...InitSliceOption) []V {
 	return slices.AppendSeq(slice, seq)
 }
 
+// CollectSorted collects the elements of a sequence into a new slice, sorting them at the end.
+func CollectSorted[V cmp.Ordered](seq iter.Seq[V], opts ...InitSliceOption) []V {
+	slice := Collect(seq, opts...)
+	slices.Sort(slice)
+	return slice
+}
+
+// CollectSortedFunc collects the elements of a sequence into a new slice, sorting them at the end with the by the
+// given comparison function.
+func CollectSortedFunc[V any](seq iter.Seq[V], cmp func(a, b V) int, opts ...InitSliceOption) []V {
+	slice := Collect(seq, opts...)
+	slices.SortFunc(slice, cmp)
+	return slice
+}
+
 // Collect2 collects the elements of a sequence of pairs into two new slices,
 // one for keys and one for values.
 func Collect2[K, V any](seq iter.Seq2[K, V], opts ...InitSliceOption) ([]K, []V) {
@@ -40,6 +56,29 @@ func Collect2[K, V any](seq iter.Seq2[K, V], opts ...InitSliceOption) ([]K, []V)
 		vSlice = initSlice[[]V](o)
 	)
 	return AppendSeq2(kSlice, vSlice, seq)
+}
+
+// Collect2Sorted collects the elements of a sequence of pairs into two new slices,
+// one for keys and one for values, sorting them at the end.
+func Collect2Sorted[K, V cmp.Ordered](seq iter.Seq2[K, V], opts ...InitSliceOption) ([]K, []V) {
+	kSlice, vSlice := Collect2(seq, opts...)
+	slices.Sort(kSlice)
+	slices.Sort(vSlice)
+	return kSlice, vSlice
+}
+
+// Collect2SortedFunc collects the elements of a sequence of pairs into two new slices,
+// one for keys and one for values, sorting them at the end by the given comparison functions.
+func Collect2SortedFunc[K, V any](
+	seq iter.Seq2[K, V],
+	cmpKey func(a, b K) int,
+	cmpValue func(a, b V) int,
+	opts ...InitSliceOption,
+) ([]K, []V) {
+	kSlice, vSlice := Collect2(seq, opts...)
+	slices.SortFunc(kSlice, cmpKey)
+	slices.SortFunc(vSlice, cmpValue)
+	return kSlice, vSlice
 }
 
 // TryAppendSeq appends the elements of a sequence to a slice, stopping at the first error.
@@ -57,6 +96,28 @@ func TryAppendSeq[Slice ~[]V, V any](s Slice, seq iter.Seq2[V, error]) (Slice, e
 func TryCollect[V any](seq iter.Seq2[V, error], opts ...InitSliceOption) ([]V, error) {
 	res := initSliceFromOpts[[]V](opts)
 	return TryAppendSeq(res, seq)
+}
+
+// TryCollectSorted collects the elements of a sequence into a new slice, stopping at the first error, sorting the
+// slice at the end if there was no error.
+func TryCollectSorted[V cmp.Ordered](seq iter.Seq2[V, error], opts ...InitSliceOption) ([]V, error) {
+	res, err := TryCollect(seq, opts...)
+	if err != nil {
+		return nil, err
+	}
+	slices.Sort(res)
+	return res, nil
+}
+
+// TryCollectSortedFunc collects the elements of a sequence into a new slice, stopping at the first error, sorting the
+// slice at the end with the given comparison function if there was no error.
+func TryCollectSortedFunc[V any](seq iter.Seq2[V, error], cmp func(a, b V) int, opts ...InitSliceOption) ([]V, error) {
+	res, err := TryCollect(seq, opts...)
+	if err != nil {
+		return nil, err
+	}
+	slices.SortFunc(res, cmp)
+	return res, nil
 }
 
 // CopySeq copies elements from a sequence to a slice, returning the number of elements copied.
