@@ -18,7 +18,7 @@ func Flatten[S ~[]V, V any](ss []S, opts ...InitSliceOption) S {
 }
 
 // AppendMapped appends the results of calling f on each element of s to res.
-func AppendMapped[SIn ~[]VIn, SOut ~[]VOut, VIn, VOut any](res SOut, s SIn, f func(VIn) VOut) []VOut {
+func AppendMapped[SIn ~[]VIn, SOut ~[]VOut, VIn, VOut any](res SOut, s SIn, f func(VIn) VOut) SOut {
 	for _, v := range s {
 		res = append(res, f(v))
 	}
@@ -32,7 +32,7 @@ func Map[S ~[]VIn, VIn, VOut any](s S, f func(VIn) VOut, opts ...InitSliceOption
 }
 
 // AppendMappedRef appends the results of calling f on a reference to each element of s to res.
-func AppendMappedRef[SIn ~[]VIn, SOut ~[]VOut, VIn, VOut any](res SOut, s SIn, f func(*VIn) VOut) []VOut {
+func AppendMappedRef[SIn ~[]VIn, SOut ~[]VOut, VIn, VOut any](res SOut, s SIn, f func(*VIn) VOut) SOut {
 	for _, v := range s {
 		res = append(res, f(&v))
 	}
@@ -43,6 +43,21 @@ func AppendMappedRef[SIn ~[]VIn, SOut ~[]VOut, VIn, VOut any](res SOut, s SIn, f
 func MapRef[S ~[]VIn, VIn, VOut any](s S, f func(*VIn) VOut, opts ...InitSliceOption) []VOut {
 	res := initSlice[[]VOut](toInitSliceOptions(opts).minCapHint(len(s)))
 	return AppendMappedRef(res, s, f)
+}
+
+// AppendMappedDerefed returns the result of appending the transformed values of the in slice by calling f,
+// dereferencing the resulting elements.
+func AppendMappedDerefed[SIn ~[]VIn, SOut ~[]VOut, VIn, VOut any](res SOut, s SIn, f func(VIn) *VOut) SOut {
+	for _, v := range s {
+		res = append(res, *f(v))
+	}
+	return res
+}
+
+// MapDeref returns a new slice containing the results of calling f, dereferencing the resulting elements.
+func MapDeref[S ~[]VIn, VIn, VOut any](s S, f func(VIn) *VOut, opts ...InitSliceOption) []VOut {
+	res := initSlice[[]VOut](toInitSliceOptions(opts).minCapHint(len(s)))
+	return AppendMappedDerefed(res, s, f)
 }
 
 // MapRefDeref returns a new slice containing the dereferenced results of calling f on a reference to each element of s.

@@ -10,6 +10,19 @@ import (
 	"spheric.cloud/xstd/container/set"
 )
 
+// Map applies the given function to all map key-value pairs, returning a new map with the resulting values.
+func Map[Map ~map[KIn]VIn, KIn comparable, VIn any, KOut comparable, VOut any](m Map, f func(
+	KIn,
+	VIn,
+) (KOut, VOut)) map[KOut]VOut {
+	res := make(map[KOut]VOut, len(m))
+	for kIn, vIn := range m {
+		kOut, vOut := f(kIn, vIn)
+		res[kOut] = vOut
+	}
+	return res
+}
+
 // Inverse returns a new map with the keys and values swapped.
 // If multiple keys map to the same value, only one will be present in the result.
 func Inverse[Map ~map[K]V, K, V comparable](m Map) map[V]K {
@@ -71,10 +84,34 @@ func KeySlice[Map ~map[K]V, K comparable, V any](m Map) []K {
 	return slices.AppendSeq(res, maps.Keys(m))
 }
 
+// KeyRefSlice returns a slice of pointers to all keys in the map.
+func KeyRefSlice[Map ~map[K]V, K comparable, V any](m Map) []*K {
+	res := make([]*K, 0, len(m))
+	return slices.AppendSeq(res, func(yield func(*K) bool) {
+		for k := range m {
+			if !yield(new(k)) {
+				return
+			}
+		}
+	})
+}
+
 // ValueSlice returns a slice of all values in the map.
 func ValueSlice[Map ~map[K]V, K comparable, V any](m Map) []V {
 	res := make([]V, 0, len(m))
 	return slices.AppendSeq(res, maps.Values(m))
+}
+
+// ValueRefSlice returns a slice of pointers to all values in the map.
+func ValueRefSlice[Map ~map[K]V, K comparable, V any](m Map) []*V {
+	res := make([]*V, 0, len(m))
+	return slices.AppendSeq(res, func(yield func(*V) bool) {
+		for _, v := range m {
+			if !yield(new(v)) {
+				return
+			}
+		}
+	})
 }
 
 // KeySet returns a set of all keys in the map.

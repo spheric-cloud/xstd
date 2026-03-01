@@ -96,11 +96,54 @@ func TryCopySeq[Slice ~[]V, V any](dst Slice, src iter.Seq2[V, error]) (int, err
 	return i, nil
 }
 
+// AppendRefs appends references of the values in sIn to sOut.
+func AppendRefs[SOut ~[]*V, SIn ~[]V, V any](sOut SOut, sIn SIn) SOut {
+	for i := range sIn {
+		sOut = append(sOut, &sIn[i])
+	}
+	return sOut
+}
+
+// Refs returns a slice of references to the input slice.
+func Refs[Slice ~[]V, V any](s Slice, opts ...InitSliceOption) []*V {
+	res := initSlice[[]*V]((&initSliceOptions{}).
+		ApplyOptions(opts).
+		minCapHint(len(s)))
+	return AppendRefs(res, s)
+}
+
+// AppendDerefs appends the dereferenced values of sIn to sOut.
+func AppendDerefs[SOut ~[]V, SIn ~[]*V, V any](sOut SOut, sIn SIn) SOut {
+	for i := range sIn {
+		sOut = append(sOut, *sIn[i])
+	}
+	return sOut
+}
+
+// Derefs returns a slice of the values the input slice values point to.
+func Derefs[Slice ~[]*V, V any](s Slice, opts ...InitSliceOption) []V {
+	res := initSlice[[]V]((&initSliceOptions{}).
+		ApplyOptions(opts).
+		minCapHint(len(s)))
+	return AppendDerefs(res, s)
+}
+
 // RefValues returns a sequence of pointers to the elements of a slice.
 func RefValues[Slice ~[]V, V any](s Slice) iter.Seq[*V] {
 	return func(yield func(*V) bool) {
 		for i := 0; i < len(s); i++ {
 			if !yield(&s[i]) {
+				return
+			}
+		}
+	}
+}
+
+// DerefValues returns a sequence of values to elements of the slice point to.
+func DerefValues[Slice ~[]*V, V any](s Slice) iter.Seq[V] {
+	return func(yield func(V) bool) {
+		for i := 0; i < len(s); i++ {
+			if !yield(*s[i]) {
 				return
 			}
 		}
