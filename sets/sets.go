@@ -5,8 +5,10 @@
 package sets
 
 import (
+	"cmp"
 	"iter"
 	"maps"
+	"slices"
 
 	"spheric.cloud/xstd/container/set"
 )
@@ -71,7 +73,27 @@ func Equal[V comparable](s1, s2 set.Set[V]) bool {
 
 // Values returns a sequence of the values in the set.
 func Values[V comparable](s set.Set[V]) iter.Seq[V] {
-	return maps.Keys(s)
+	return s.Values()
+}
+
+// Slice returns a slice of all values in the set.
+func Slice[V comparable](s set.Set[V]) []V {
+	res := make([]V, 0, s.Len())
+	return slices.AppendSeq(res, s.Values())
+}
+
+// SortedSlice returns a sorted slice of all values in the set.
+func SortedSlice[V cmp.Ordered](s set.Set[V]) []V {
+	res := Slice(s)
+	slices.Sort(res)
+	return res
+}
+
+// SortedSliceFunc returns a sorted slice by the given comparison function of all values in the set.
+func SortedSliceFunc[V cmp.Ordered](s set.Set[V], cmp func(a, b V) int) []V {
+	res := Slice(s)
+	slices.SortFunc(res, cmp)
+	return res
 }
 
 // Pop removes and returns an arbitrary value from the set.
