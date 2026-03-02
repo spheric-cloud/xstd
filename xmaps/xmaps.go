@@ -125,7 +125,7 @@ func SortedValueSlice[Map ~map[K]V, K comparable, V cmp.Ordered](m Map) []V {
 }
 
 // SortedValueSliceFunc returns a slice of all values in the map sorted by the given function.
-func SortedValueSliceFunc[Map ~map[K]V, K comparable, V cmp.Ordered](m Map, cmp func(a, b V) int) []V {
+func SortedValueSliceFunc[Map ~map[K]V, K comparable, V any](m Map, cmp func(a, b V) int) []V {
 	res := ValueSlice(m)
 	slices.SortFunc(res, cmp)
 	return res
